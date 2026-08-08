@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Phenyo, my love</title>
+<meta name="theme-color" content="#04030c" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Inter:wght@200;300;400&display=swap" rel="stylesheet" />
+<style>
+/* ────────────────────────────────────────────────
+   Tokens
+   ──────────────────────────────────────────────── */
+:root{
+  --night-0:#04030c;
+  --night-1:#080619;
+  --violet:#1d1150;
+  --violet-soft:rgba(94,58,190,.20);
+  --gold:#f2dcb0;
+  --gold-warm:#e3c384;
+  --gold-dim:rgba(242,220,176,.55);
+  --gold-faint:rgba(242,220,176,.16);
+  --serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body::-webkit-scrollbar{display:none}
+
+html,body{height:100%}
+
+body{
+  background:var(--night-0);
+  color:var(--gold);
+  font-family:var(--sans);
+  overflow-x:hidden;
+  overflow-y:auto;            /* safety valve — never clip the card on short screens */
+  scrollbar-width:none;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+}
+
+/* ────────────────────────────────────────────────
+   Sky layers
+   ──────────────────────────────────────────────── */
+.sky-base{
+  position:fixed; inset:0; z-index:0;
+  background:
+    radial-gradient(120% 80% at 18% 12%, rgba(76,44,158,.20) 0%, transparent 55%),
+    radial-gradient(100% 70% at 84% 82%, rgba(122,64,180,.16) 0%, transparent 58%),
+    radial-gradient(140% 100% at 50% 45%, #0d0a24 0%, var(--night-1) 42%, var(--night-0) 100%);
+}
+
+/* slow nebula breathing — barely perceptible, but the eye feels it */
+.nebula{
+  position:fixed; inset:-20%; z-index:0;
+  background:
+    radial-gradient(45% 35% at 32% 38%, rgba(108,60,200,.16), transparent 70%),
+    radial-gradient(40% 30% at 70% 66%, rgba(64,40,150,.14), transparent 72%);
+  filter:blur(48px);
+  animation:drift 44s ease-in-out infinite alternate;
+  pointer-events:none;
+}
+@keyframes drift{
+  0%  {transform:translate3d(-1.5%,1%,0) scale(1.00); opacity:.75}
+  100%{transform:translate3d(2%,-1.5%,0) scale(1.08); opacity:1}
+}
+
+#sky{position:fixed; inset:0; z-index:1; display:block}
+
+/* vignette keeps the eye centred */
+.vignette{
+  position:fixed; inset:0; z-index:2; pointer-events:none;
+  background:radial-gradient(115% 85% at 50% 48%, transparent 42%, rgba(2,2,8,.55) 100%);
+}
+
+/* ────────────────────────────────────────────────
+   Stage
+   ──────────────────────────────────────────────── */
+.stage{
+  position:relative; z-index:3;
+  min-height:100dvh;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:clamp(24px,5vh,64px) clamp(20px,6vw,48px);
+  gap:clamp(20px,4.2vh,46px);
+}
+
+/* ────────────────────────────────────────────────
+   Aries
+   ──────────────────────────────────────────────── */
+.aries-wrap{
+  /* the 58vh cap is a height budget in disguise: the art is 1.45:1, so this
+     keeps the constellation under ~40vh and leaves room for the card below */
+  width:min(680px,88vw,58vh);
+  opacity:0;
+  transform:scale(.965);
+  transition:opacity 2.4s var(--ease), transform 2.4s var(--ease);
+}
+.aries-wrap.in{opacity:1; transform:none}
+
+.aries{
+  width:100%; height:auto; display:block; overflow:visible;
+  transition:filter 1.6s var(--ease);
+  filter:drop-shadow(0 0 22px rgba(226,190,120,.16));
+}
+.aries.revealed{filter:drop-shadow(0 0 40px rgba(240,206,138,.38))}
+
+.link{
+  fill:none;
+  stroke:url(#lineGrad);
+  stroke-width:1.15;
+  stroke-linecap:round;
+  opacity:0;
+  stroke-dasharray:1 1;
+  stroke-dashoffset:1;
+  transition:opacity 1.2s var(--ease), stroke-width 1.6s var(--ease);
+}
+.aries-wrap.in .link{
+  opacity:.62;
+  animation:draw 2.6s var(--ease) forwards;
+}
+.aries.revealed .link{opacity:.92; stroke-width:1.5}
+@keyframes draw{to{stroke-dashoffset:0}}
+
+.halo{opacity:.85; transform-box:fill-box; transform-origin:center;
+      animation:pulse var(--dur,5.5s) ease-in-out infinite; animation-delay:var(--delay,0s);
+      transition:opacity 1.6s var(--ease)}
+.core{fill:#fffaf0; transform-box:fill-box; transform-origin:center;
+      animation:corepulse var(--dur,5.5s) ease-in-out infinite; animation-delay:var(--delay,0s)}
+.aries.revealed .halo{opacity:1}
+
+@keyframes pulse{
+  0%,100%{transform:scale(.9);  opacity:.66}
+  50%    {transform:scale(1.14); opacity:1}
+}
+@keyframes corepulse{
+  0%,100%{transform:scale(.88); opacity:.86}
+  50%    {transform:scale(1.06); opacity:1}
+}
+
+.star-name{
+  fill:var(--gold-dim);
+  font-family:var(--sans);
+  font-size:13px;
+  font-weight:300;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  opacity:0;
+  transition:opacity 1.4s var(--ease);
+}
+.aries-wrap.in .star-name{opacity:.42}
+.aries.revealed .star-name{opacity:.62}
+
+/* ────────────────────────────────────────────────
+   Headline
+   ──────────────────────────────────────────────── */
+.headline{
+  text-align:center;
+  opacity:0; transform:translateY(14px);
+  transition:opacity 1.8s var(--ease), transform 1.8s var(--ease);
+}
+.headline.in{opacity:1; transform:none}
+
+.headline h1{
+  font-family:var(--serif);
+  font-style:italic;
+  font-weight:300;
+  font-size:clamp(2.3rem,7.2vw,4.6rem);
+  line-height:1.06;
+  letter-spacing:.005em;
+  color:#fdf6e8;
+  text-shadow:0 0 34px rgba(238,205,142,.34), 0 0 90px rgba(150,96,220,.18);
+}
+.headline h1 .heart{
+  font-style:normal;
+  font-size:.62em;
+  vertical-align:.14em;
+  margin-left:.14em;
+  filter:drop-shadow(0 0 12px rgba(255,110,140,.6));
+  animation:beat 3.4s ease-in-out infinite;
+  display:inline-block;
+}
+@keyframes beat{
+  0%,100%{transform:scale(1)}
+  46%{transform:scale(1)}
+  53%{transform:scale(1.13)}
+  60%{transform:scale(1)}
+  67%{transform:scale(1.08)}
+  74%{transform:scale(1)}
+}
+
+.headline .sub{
+  margin-top:clamp(10px,1.6vh,16px);
+  font-size:clamp(.62rem,1.5vw,.72rem);
+  font-weight:200;
+  letter-spacing:.42em;
+  text-transform:uppercase;
+  color:rgba(242,220,176,.36);
+}
+
+/* ────────────────────────────────────────────────
+   Reveal slot (button ⇄ card share this space)
+   ──────────────────────────────────────────────── */
+.slot{
+  position:relative;
+  width:min(560px,92vw);
+  min-height:clamp(230px,30vh,290px);   /* holds the card in flow so it can't be clipped */
+  display:flex; align-items:flex-start; justify-content:center;
+}
+
+.reveal-btn{
+  position:absolute; top:8px;
+  border:0; background:none; outline:none; cursor:pointer;
+  padding:14px 10px 18px;
+  font-family:var(--sans);
+  font-size:clamp(.74rem,1.9vw,.84rem);
+  font-weight:300;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:var(--gold);
+  opacity:0; transform:translateY(12px);
+  transition:opacity 1.6s var(--ease), transform 1.6s var(--ease),
+             color .7s var(--ease), text-shadow .7s var(--ease), letter-spacing .7s var(--ease);
+  text-shadow:0 0 18px rgba(238,205,142,.34);
+  -webkit-tap-highlight-color:transparent;
+}
+.reveal-btn.in{opacity:1; transform:none}
+
+/* hairline of light beneath the label */
+.reveal-btn::after{
+  content:""; position:absolute; left:50%; bottom:6px;
+  width:22px; height:1px;
+  transform:translateX(-50%);
+  background:linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity:.4;
+  transition:width .9s var(--ease), opacity .9s var(--ease);
+}
+.reveal-btn:hover,.reveal-btn:focus-visible{
+  color:#fff6e2;
+  letter-spacing:.32em;
+  text-shadow:0 0 26px rgba(245,215,155,.7), 0 0 60px rgba(150,96,220,.3);
+}
+.reveal-btn:hover::after,.reveal-btn:focus-visible::after{width:78%; opacity:.75}
+.reveal-btn:active{transform:scale(.985)}
+
+.reveal-btn.gone{
+  opacity:0;
+  transform:translateY(-16px) scale(.97);
+  filter:blur(6px);
+  pointer-events:none;
+  transition:opacity .8s var(--ease), transform .8s var(--ease), filter .8s var(--ease);
+}
+
+/* ────────────────────────────────────────────────
+   Glass card
+   ──────────────────────────────────────────────── */
+.card{
+  position:absolute; top:0; left:0; right:0;
+  padding:clamp(28px,5vw,42px) clamp(24px,5vw,44px) clamp(24px,4vw,34px);
+  border-radius:22px;
+  background:linear-gradient(150deg, rgba(255,244,222,.075), rgba(120,86,200,.05) 55%, rgba(255,244,222,.03));
+  border:1px solid rgba(242,220,176,.16);
+  -webkit-backdrop-filter:blur(26px) saturate(150%);
+  backdrop-filter:blur(26px) saturate(150%);
+  box-shadow:
+    0 26px 70px -22px rgba(0,0,0,.78),
+    0 0 60px -18px rgba(150,96,220,.30),
+    inset 0 1px 0 rgba(255,246,228,.16);
+  text-align:center;
+  opacity:0;
+  transform:translateY(20px) scale(.96);
+  filter:blur(8px);
+  pointer-events:none;
+  transition:opacity 1.3s var(--ease), transform 1.3s var(--ease), filter 1.3s var(--ease);
+}
+.card.in{
+  opacity:1;
+  transform:none;
+  filter:none;
+  pointer-events:auto;
+  animation:float 9s ease-in-out 1.4s infinite;
+}
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%    {transform:translateY(-7px)}
+}
+
+.card .mark{
+  display:block;
+  font-size:.7rem;
+  letter-spacing:.4em;
+  color:var(--gold-dim);
+  margin-bottom:clamp(16px,2.4vh,22px);
+  opacity:.7;
+}
+
+.card p{
+  font-family:var(--serif);
+  font-style:italic;
+  font-weight:300;
+  font-size:clamp(1.28rem,3.6vw,1.72rem);
+  line-height:1.5;
+  color:#fdf5e6;
+  text-shadow:0 0 26px rgba(238,205,142,.2);
+}
+
+.card .rule{
+  width:46px; height:1px; margin:clamp(20px,3vh,26px) auto clamp(12px,1.8vh,16px);
+  background:linear-gradient(90deg,transparent,var(--gold-faint) 20%,var(--gold-dim),var(--gold-faint) 80%,transparent);
+}
+
+.card .note{
+  font-size:.6rem;
+  font-weight:200;
+  letter-spacing:.26em;
+  text-transform:uppercase;
+  color:rgba(242,220,176,.34);
+}
+
+/* ────────────────────────────────────────────────
+   Responsive
+   ──────────────────────────────────────────────── */
+/* short desktops (720p laptops) — reclaim vertical space from gaps and card padding */
+@media (max-height:820px) and (min-width:641px){
+  .stage{gap:clamp(12px,2.2vh,22px)}
+  .aries-wrap{width:min(680px,88vw,54vh)}
+  .slot{min-height:250px}
+  .card{padding:30px 34px 26px}
+  .card p{font-size:clamp(1.16rem,2.4vw,1.42rem); line-height:1.46}
+  .card .mark{margin-bottom:14px}
+  .card .rule{margin:18px auto 12px}
+}
+
+@media (max-width:640px){
+  .stage{gap:clamp(16px,3vh,28px)}
+  .aries-wrap{width:min(94vw,52vh)}
+  .star-name{font-size:15px; letter-spacing:.16em}
+  .slot{min-height:clamp(240px,34vh,300px)}
+  .card{border-radius:20px}
+}
+
+/* phone held sideways — go two-column instead of stacking */
+@media (max-height:620px) and (orientation:landscape){
+  .stage{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    grid-template-areas:"aries head" "aries slot";
+    align-content:center; align-items:center;
+    column-gap:clamp(18px,4vw,40px); row-gap:8px;
+    padding:16px clamp(16px,4vw,32px);
+  }
+  .aries-wrap{grid-area:aries; width:min(100%,76vh); justify-self:center}
+  .headline{grid-area:head; align-self:end}
+  .headline h1{font-size:clamp(1.6rem,4.4vw,2.4rem)}
+  .headline .sub{letter-spacing:.3em}
+  .slot{grid-area:slot; align-self:start; width:100%; min-height:clamp(150px,44vh,190px)}
+  .card{padding:20px 22px 18px; border-radius:18px}
+  .card p{font-size:clamp(.98rem,2.2vw,1.14rem); line-height:1.42}
+  .card .mark{margin-bottom:10px}
+  .card .rule{margin:12px auto 8px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.24s !important}
+  .nebula{animation:none}
+}
+</style>
+</head>
+<body>
+
+<div class="sky-base"></div>
+<div class="nebula"></div>
+<canvas id="sky"></canvas>
+<div class="vignette"></div>
+
+<main class="stage">
+
+  <div class="aries-wrap" id="ariesWrap">
+    <svg class="aries" id="aries" viewBox="-56 -46 672 462" role="img" aria-label="The Aries constellation">
+      <defs>
+        <radialGradient id="halo">
+          <stop offset="0%"   stop-color="#fff8ea" stop-opacity=".95"/>
+          <stop offset="26%"  stop-color="#f6dfae" stop-opacity=".46"/>
+          <stop offset="55%"  stop-color="#d9a86a" stop-opacity=".16"/>
+          <stop offset="100%" stop-color="#b98be8" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%"   stop-color="#f2dcb0" stop-opacity=".25"/>
+          <stop offset="50%"  stop-color="#ffeecb" stop-opacity=".95"/>
+          <stop offset="100%" stop-color="#f2dcb0" stop-opacity=".25"/>
+        </linearGradient>
+      </defs>
+
+      <!-- 41 Ari → Hamal → Sheratan → Mesarthim (true sky geometry) -->
+      <path class="link" pathLength="1" d="M 30 40 L 409 175"/>
+      <path class="link" pathLength="1" d="M 409 175 L 520 268" style="animation-delay:.5s"/>
+      <path class="link" pathLength="1" d="M 520 268 L 530 322" style="animation-delay:1s"/>
+
+      <g id="ariesStars"></g>
+    </svg>
+  </div>
+
+  <div class="headline" id="headline">
+    <h1>Phenyo, my love<span class="heart">❤️</span></h1>
+    <div class="sub">Aries &nbsp;·&nbsp; tonight&rsquo;s only constellation</div>
+  </div>
+
+  <div class="slot">
+    <button class="reveal-btn" id="revealBtn" type="button">✨&nbsp; Reveal Something Special</button>
+
+    <article class="card" id="card" aria-live="polite">
+      <span class="mark">✧</span>
+      <p id="complimentText"></p>
+      <div class="rule"></div>
+      <div class="note" id="cardNote">A new one arrives tomorrow</div>
+    </article>
+  </div>
+
+</main>
+
+<script>
+(() => {
+'use strict';
+
+/* ══════════════════════════════════════════════════
+   1. The compliments — edit freely, order doesn't matter
+   ══════════════════════════════════════════════════ */
+const COMPLIMENTS = [
+  "The stars agree — you were born to shine.",
+  "Even the night sky pauses to admire your light.",
+  "If kindness were a constellation, it would look just like you.",
+  "The universe is a little brighter because you're in it.",
+  "Some stars guide travelers. You brighten hearts.",
+  "The moon may light the night, but your smile lights the soul.",
+  "Even among billions of stars, you'd still be the one I'd notice.",
+  "Every shooting star wishes it could be as unforgettable as you.",
+  "Your heart shines brighter than the clearest night sky.",
+  "The cosmos whispered your name long before anyone else did.",
+  "You carry the kind of light that never fades.",
+  "The stars don't compete with you — they simply celebrate you.",
+  "Your presence turns ordinary moments into beautiful memories.",
+  "Somewhere in the universe, a star twinkles every time you smile.",
+  "You make darkness feel a little less lonely.",
+  "You were never meant to blend in — you were made to shine.",
+  "Even galaxies would envy the warmth you bring.",
+  "Every constellation tells a story; yours tells one of beauty and grace.",
+  "Some lights are seen. Yours is felt.",
+  "If happiness had a home, it would probably orbit around you.",
+  "You have the kind of soul that even the stars admire.",
+  "Tonight's brightest constellation has nothing on you.",
+  "The sky is full of stars, yet somehow you remain the rarest one.",
+  "The universe has countless wonders — you'll always be one of them.",
+  "Even Polaris couldn't guide people as effortlessly as your kindness does.",
+  "You remind the stars why they sparkle.",
+  "If hope had a constellation, your name would be written across it.",
+  "Some people chase stars. You're the reason they're worth chasing.",
+  "The heavens painted the night beautifully — but they outdid themselves with you.",
+  "Never forget: even on cloudy nights, the stars are still there… just like your light.",
+  "The stars only borrowed their sparkle from you.",
+  "Tonight's sky has a favorite star… and it isn't in the sky.",
+  "The universe wrote poetry; then it created you.",
+  "Every night the stars gather for one reason — to remind the world that beauty exists. They still mention you.",
+  "The Aries constellation shines proudly tonight… perhaps because it knows you're looking."
+];
+
+const NAME = "PHENYO";
+
+/* ══════════════════════════════════════════════════
+   2. Environment
+   ══════════════════════════════════════════════════ */
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const canvas  = document.getElementById('sky');
+const ctx     = canvas.getContext('2d', { alpha: true });
+
+let W = 0, H = 0, DPR = 1;
+const isSmall = () => W < 720;
+
+/* ══════════════════════════════════════════════════
+   3. Aries — real star data, plotted from RA / Dec
+   ══════════════════════════════════════════════════ */
+const ARIES = [
+  { name: '41 Arietis', x:  30, y:  40, r: 6.0 },
+  { name: 'Hamal',      x: 409, y: 175, r: 9.0 },
+  { name: 'Sheratan',   x: 520, y: 268, r: 7.4 },
+  { name: 'Mesarthim',  x: 530, y: 322, r: 5.4 }
+];
+const LABELS = [
+  { i: 0, dx:  16, dy: -18, anchor: 'start' },
+  { i: 1, dx:   0, dy: -30, anchor: 'middle' },
+  { i: 2, dx: -16, dy:  -8, anchor: 'end' },
+  { i: 3, dx: -16, dy:  22, anchor: 'end' }
+];
+
+(function buildAries(){
+  const g = document.getElementById('ariesStars');
+  const NS = 'http://www.w3.org/2000/svg';
+  ARIES.forEach((s, i) => {
+    const halo = document.createElementNS(NS, 'circle');
+    halo.setAttribute('class', 'halo');
+    halo.setAttribute('cx', s.x); halo.setAttribute('cy', s.y);
+    halo.setAttribute('r', s.r * 5.6);
+    halo.setAttribute('fill', 'url(#halo)');
+    halo.style.setProperty('--delay', (i * 1.15) + 's');
+    halo.style.setProperty('--dur', (5.2 + i * 0.7) + 's');
+    g.appendChild(halo);
+
+    const core = document.createElementNS(NS, 'circle');
+    core.setAttribute('class', 'core');
+    core.setAttribute('cx', s.x); core.setAttribute('cy', s.y);
+    core.setAttribute('r', s.r * 0.42);
+    core.style.setProperty('--delay', (i * 1.15) + 's');
+    core.style.setProperty('--dur', (5.2 + i * 0.7) + 's');
+    g.appendChild(core);
+  });
+  LABELS.forEach(l => {
+    const s = ARIES[l.i];
+    const t = document.createElementNS(NS, 'text');
+    t.setAttribute('class', 'star-name');
+    t.setAttribute('x', s.x + l.dx); t.setAttribute('y', s.y + l.dy);
+    t.setAttribute('text-anchor', l.anchor);
+    t.textContent = s.name;
+    g.appendChild(t);
+  });
+})();
+
+/* ══════════════════════════════════════════════════
+   4. Starfield
+   ══════════════════════════════════════════════════ */
+const stars = [];
+const shooting = [];
+const dust = [];
+
+function buildStars(){
+  stars.length = 0;
+  const count = Math.round(Math.min(660, Math.max(240, (W * H) / 2200)));
+  for (let i = 0; i < count; i++){
+    const depth = Math.random();                 // 0 = far, 1 = near
+    stars.push({
+      bx: Math.random() * W,
+      by: Math.random() * H,
+      r: 0.28 + depth * depth * 1.5,
+      base: 0.20 + depth * 0.62,
+      hue: Math.random() < 0.14 ? 'warm' : (Math.random() < 0.12 ? 'cool' : 'white'),
+      ph: Math.random() * Math.PI * 2,
+      sp: 0.28 + Math.random() * 0.9,            // twinkle speed
+      vx: (Math.random() - 0.5) * 0.014 * (0.35 + depth),
+      vy: (Math.random() - 0.5) * 0.010 * (0.35 + depth),
+      tx: null, ty: null, boost: 0
+    });
+  }
+}
+
+function resize(){
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  const el = document.documentElement;
+  W = window.innerWidth  || el.clientWidth  || 0;
+  H = window.innerHeight || el.clientHeight || 0;
+  // a background or still-laying-out tab can report 0 — wait for real dimensions
+  if (W < 2 || H < 2){ requestAnimationFrame(resize); return; }
+  canvas.width  = Math.round(W * DPR);
+  canvas.height = Math.round(H * DPR);
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  buildStars();
+  if (nameSeq.phase !== 'idle' && nameSeq.phase !== 'done') nameSeq.abort();
+  // paint immediately so the sky is never blank, even if rAF is throttled
+  render(performance.now());
+}
+
+const TINT = {
+  white: [255, 250, 242],
+  warm:  [255, 226, 186],
+  cool:  [206, 218, 255]
+};
+
+/* ── shooting stars ─────────────────────────────── */
+function spawnShooting(){
+  const fromLeft = Math.random() < 0.5;
+  const speed = 7.5 + Math.random() * 6;
+  const ang = (fromLeft ? 0.32 : Math.PI - 0.32) + (Math.random() - 0.5) * 0.34;
+  shooting.push({
+    x: fromLeft ? -60 : W + 60,
+    y: Math.random() * H * 0.55,
+    vx: Math.cos(ang) * speed,
+    vy: Math.sin(ang) * speed,
+    life: 0,
+    max: 90 + Math.random() * 45,
+    len: 90 + Math.random() * 130
+  });
+}
+function scheduleShooting(){
+  if (reduced) return;
+  setTimeout(() => { spawnShooting(); scheduleShooting(); }, 6500 + Math.random() * 12000);
+}
+
+function drawShooting(s){
+  const t = s.life / s.max;
+  const fade = t < 0.16 ? t / 0.16 : (1 - (t - 0.16) / 0.84);
+  const a = Math.max(0, fade) * 0.9;
+  const m = Math.hypot(s.vx, s.vy) || 1;
+  const tailX = s.x - (s.vx / m) * s.len;
+  const tailY = s.y - (s.vy / m) * s.len;
+  const g = ctx.createLinearGradient(s.x, s.y, tailX, tailY);
+  g.addColorStop(0,   `rgba(255,250,235,${a})`);
+  g.addColorStop(0.28,`rgba(246,220,175,${a * 0.5})`);
+  g.addColorStop(1,   'rgba(180,150,255,0)');
+  ctx.strokeStyle = g;
+  ctx.lineWidth = 1.5;
+  ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(s.x, s.y); ctx.lineTo(tailX, tailY); ctx.stroke();
+
+  const h = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, 9);
+  h.addColorStop(0, `rgba(255,252,240,${a})`);
+  h.addColorStop(1, 'rgba(255,240,210,0)');
+  ctx.fillStyle = h;
+  ctx.beginPath(); ctx.arc(s.x, s.y, 9, 0, Math.PI * 2); ctx.fill();
+}
+
+/* ── cursor stardust ────────────────────────────── */
+let lastDust = 0;
+function spawnDust(x, y){
+  if (reduced) return;
+  const now = performance.now();
+  if (now - lastDust < 22 || dust.length > 90) return;
+  lastDust = now;
+  const n = 1 + (Math.random() < 0.4 ? 1 : 0);
+  for (let i = 0; i < n; i++){
+    dust.push({
+      x: x + (Math.random() - 0.5) * 14,
+      y: y + (Math.random() - 0.5) * 14,
+      vx: (Math.random() - 0.5) * 0.5,
+      vy: (Math.random() - 0.5) * 0.5 - 0.12,
+      r: 0.6 + Math.random() * 1.5,
+      life: 0,
+      max: 34 + Math.random() * 26
+    });
+  }
+}
+window.addEventListener('pointermove', e => spawnDust(e.clientX, e.clientY), { passive: true });
+
+/* ══════════════════════════════════════════════════
+   5. "PHENYO" traced in the stars — once per visit
+   ══════════════════════════════════════════════════ */
+const nameSeq = {
+  phase: 'idle',            // idle → gather → hold → scatter → done
+  t0: 0,
+  members: [],
+  GATHER: 2000, HOLD: 1700, SCATTER: 2000,
+
+  samplePoints(){
+    const off = document.createElement('canvas');
+    const octx = off.getContext('2d', { willReadFrequently: true });
+    off.width = W; off.height = H;
+    const size = Math.min(W * 0.155, H * 0.30);
+    octx.font = `300 ${size}px "Cormorant Garamond", Georgia, serif`;
+    octx.textAlign = 'center';
+    octx.textBaseline = 'middle';
+    octx.fillStyle = '#fff';
+    // widen the letter spacing manually for an airy, constellation-like read
+    const tracking = size * 0.14;
+    const widths = [...NAME].map(ch => octx.measureText(ch).width);
+    const total = widths.reduce((a, b) => a + b, 0) + tracking * (NAME.length - 1);
+    let x = W / 2 - total / 2;
+    const y = H * 0.44;
+    [...NAME].forEach((ch, i) => {
+      octx.fillText(ch, x + widths[i] / 2, y);
+      x += widths[i] + tracking;
+    });
+
+    const step = isSmall() ? 7 : 8;
+    const data = octx.getImageData(0, 0, off.width, off.height).data;
+    const pts = [];
+    for (let py = 0; py < off.height; py += step){
+      for (let px = 0; px < off.width; px += step){
+        if (data[(py * off.width + px) * 4 + 3] > 140) pts.push({ x: px, y: py });
+      }
+    }
+    for (let i = pts.length - 1; i > 0; i--){          // shuffle
+      const j = (Math.random() * (i + 1)) | 0;
+      [pts[i], pts[j]] = [pts[j], pts[i]];
+    }
+    return pts.slice(0, isSmall() ? 130 : 240);
+  },
+
+  start(){
+    let pts = this.samplePoints();
+    if (!pts.length) { this.phase = 'done'; return; }
+    const pool = stars.filter(s => s.r > 0.40);
+    // never recruit more than 60% of the eligible stars, or the sky visibly empties
+    pts = pts.slice(0, Math.floor(pool.length * 0.6));
+    if (pts.length < 30) { this.phase = 'done'; return; }
+    const used = new Set();
+    this.members = [];
+    for (const p of pts){
+      let best = -1, bestD = Infinity;
+      for (let i = 0; i < pool.length; i++){
+        if (used.has(i)) continue;
+        const d = (pool[i].bx - p.x) ** 2 + (pool[i].by - p.y) ** 2;
+        if (d < bestD) { bestD = d; best = i; }
+      }
+      if (best < 0) break;
+      used.add(best);
+      const s = pool[best];
+      s.tx = p.x; s.ty = p.y;
+      this.members.push(s);
+    }
+    this.phase = 'gather';
+    this.t0 = performance.now();
+  },
+
+  abort(){
+    this.members.forEach(s => { s.tx = s.ty = null; s.boost = 0; });
+    this.members = [];
+    this.phase = 'done';
+  },
+
+  /** returns 0‥1 — how far the members have travelled toward their letters */
+  progress(now){
+    if (this.phase === 'idle' || this.phase === 'done') return 0;
+    const e = now - this.t0;
+    if (this.phase === 'gather'){
+      if (e >= this.GATHER) { this.phase = 'hold'; this.t0 = now; return 1; }
+      return easeInOut(e / this.GATHER);
+    }
+    if (this.phase === 'hold'){
+      if (e >= this.HOLD) { this.phase = 'scatter'; this.t0 = now; return 1; }
+      return 1;
+    }
+    if (this.phase === 'scatter'){
+      if (e >= this.SCATTER) { this.abort(); return 0; }
+      return 1 - easeInOut(e / this.SCATTER);
+    }
+    return 0;
+  }
+};
+
+const easeInOut = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+/* ══════════════════════════════════════════════════
+   6. Render loop
+   ══════════════════════════════════════════════════ */
+let glow = 0, glowTarget = 0;          // constellation-reveal brightening of the sky
+
+function render(now){
+  ctx.clearRect(0, 0, W, H);
+  const t = now / 1000;
+
+  glow += (glowTarget - glow) * 0.02;
+
+  const p = nameSeq.progress(now);
+  const inName = p > 0.001;
+
+  for (let i = 0; i < stars.length; i++){
+    const s = stars[i];
+
+    // gentle perpetual drift, wrapping at the edges
+    s.bx += s.vx; s.by += s.vy;
+    if (s.bx < -4) s.bx = W + 4; else if (s.bx > W + 4) s.bx = -4;
+    if (s.by < -4) s.by = H + 4; else if (s.by > H + 4) s.by = -4;
+
+    let x = s.bx, y = s.by, extra = 0;
+    if (inName && s.tx !== null){
+      x = s.bx + (s.tx - s.bx) * p;
+      y = s.by + (s.ty - s.by) * p;
+      extra = p * 0.55;
+    }
+
+    const tw = 0.62 + 0.38 * Math.sin(t * s.sp + s.ph);
+    let a = s.base * tw + extra + glow * 0.10;
+    if (a <= 0.012) continue;
+    if (a > 1) a = 1;
+
+    const c = TINT[s.hue];
+    const r = s.r * (1 + extra * 0.7);
+
+    // bloom
+    if (r > 0.8 || extra > 0.1){
+      const rad = r * (4.2 + extra * 3);
+      const g = ctx.createRadialGradient(x, y, 0, x, y, rad);
+      g.addColorStop(0, `rgba(${c[0]},${c[1]},${c[2]},${a * 0.30})`);
+      g.addColorStop(1, `rgba(${c[0]},${c[1]},${c[2]},0)`);
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(x, y, rad, 0, Math.PI * 2); ctx.fill();
+    }
+    // core
+    ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  }
+
+  for (let i = shooting.length - 1; i >= 0; i--){
+    const s = shooting[i];
+    s.x += s.vx; s.y += s.vy; s.life++;
+    if (s.life > s.max || s.x < -260 || s.x > W + 260 || s.y > H + 160) shooting.splice(i, 1);
+    else drawShooting(s);
+  }
+
+  for (let i = dust.length - 1; i >= 0; i--){
+    const d = dust[i];
+    d.x += d.vx; d.y += d.vy; d.vy -= 0.004; d.life++;
+    if (d.life > d.max) { dust.splice(i, 1); continue; }
+    const a = (1 - d.life / d.max) * 0.75;
+    const g = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, d.r * 5);
+    g.addColorStop(0, `rgba(255,236,196,${a})`);
+    g.addColorStop(0.4, `rgba(240,205,140,${a * 0.35})`);
+    g.addColorStop(1, 'rgba(210,170,255,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(d.x, d.y, d.r * 5, 0, Math.PI * 2); ctx.fill();
+  }
+}
+
+function frame(now){
+  render(now);
+  requestAnimationFrame(frame);
+}
+
+/* ══════════════════════════════════════════════════
+   7. One compliment per day
+   ══════════════════════════════════════════════════ */
+const KEY = 'phenyo.daily.v1';
+
+function todayKey(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function readState(){
+  try { return JSON.parse(localStorage.getItem(KEY)) || {}; }
+  catch { return {}; }
+}
+function writeState(s){
+  try { localStorage.setItem(KEY, JSON.stringify(s)); } catch {}
+}
+
+/** Returns { index, fresh } — same compliment all day, a new one each day. */
+function complimentForToday(){
+  const today = todayKey();
+  const st = readState();
+  if (st.date === today && Number.isInteger(st.index) && COMPLIMENTS[st.index]){
+    return { index: st.index, fresh: false };
+  }
+  let used = Array.isArray(st.used) ? st.used.filter(i => Number.isInteger(i)) : [];
+  let pool = COMPLIMENTS.map((_, i) => i).filter(i => !used.includes(i));
+  if (!pool.length){                                   // full cycle complete — reshuffle
+    used = Number.isInteger(st.index) ? [st.index] : [];
+    pool = COMPLIMENTS.map((_, i) => i).filter(i => !used.includes(i));
+  }
+  const index = pool[(Math.random() * pool.length) | 0];
+  used.push(index);
+  writeState({ date: today, index, used });
+  return { index, fresh: true };
+}
+
+/* ══════════════════════════════════════════════════
+   8. Reveal
+   ══════════════════════════════════════════════════ */
+const btn   = document.getElementById('revealBtn');
+const card  = document.getElementById('card');
+const text  = document.getElementById('complimentText');
+const note  = document.getElementById('cardNote');
+const aries = document.getElementById('aries');
+
+let revealed = false;
+btn.addEventListener('click', () => {
+  if (revealed) return;
+  revealed = true;
+
+  const { index, fresh } = complimentForToday();
+  text.textContent = COMPLIMENTS[index];
+  note.textContent = fresh ? 'A new one arrives tomorrow' : 'Today’s words · come back tomorrow';
+
+  btn.classList.add('gone');
+  aries.classList.add('revealed');
+  glowTarget = 1;
+
+  if (!reduced) setTimeout(spawnShooting, 700);
+  setTimeout(() => card.classList.add('in'), 620);
+});
+
+/* ══════════════════════════════════════════════════
+   9. Curtain up
+   ══════════════════════════════════════════════════ */
+const wrap = document.getElementById('ariesWrap');
+const head = document.getElementById('headline');
+
+function enter(delay){
+  setTimeout(() => wrap.classList.add('in'),  delay);
+  setTimeout(() => head.classList.add('in'),  delay + 700);
+  setTimeout(() => btn.classList.add('in'),   delay + 1400);
+}
+
+window.addEventListener('resize', resize, { passive: true });
+window.addEventListener('orientationchange', resize, { passive: true });
+if (window.ResizeObserver){
+  let firstOb = true;
+  new ResizeObserver(() => {
+    if (firstOb) { firstOb = false; return; }   // the observer always fires once on attach
+    if (canvas.width !== Math.round(window.innerWidth * DPR)) resize();
+  }).observe(document.documentElement);
+}
+resize();
+requestAnimationFrame(frame);
+scheduleShooting();
+
+const SEEN = 'phenyo.namedOnce';
+let already = false;
+try { already = sessionStorage.getItem(SEEN) === '1'; } catch {}
+
+if (already || reduced){
+  nameSeq.phase = 'done';
+  enter(500);
+} else {
+  try { sessionStorage.setItem(SEEN, '1'); } catch {}
+  setTimeout(() => nameSeq.start(), 900);
+  // the sky hands the page back just as the letters begin to dissolve
+  enter(4200);
+}
+
+})();
+</script>
+</body>
+</html>
