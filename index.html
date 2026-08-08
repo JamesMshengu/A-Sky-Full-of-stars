@@ -536,7 +536,8 @@ const dust = [];
 
 function buildStars(){
   stars.length = 0;
-  const count = Math.round(Math.min(660, Math.max(240, (W * H) / 2200)));
+  // floor is higher on phones so the star-traced name has enough dots to read clearly
+  const count = Math.round(Math.min(660, Math.max(400, (W * H) / 2200)));
   for (let i = 0; i < count; i++){
     const depth = Math.random();                 // 0 = far, 1 = near
     stars.push({
@@ -656,7 +657,8 @@ const nameSeq = {
     const off = document.createElement('canvas');
     const octx = off.getContext('2d', { willReadFrequently: true });
     off.width = W; off.height = H;
-    const size = Math.min(W * 0.155, H * 0.30);
+    // bigger, wider letters on phones — a small font sampled too few points to read
+    const size = isSmall() ? Math.min(W * 0.19, H * 0.28) : Math.min(W * 0.155, H * 0.30);
     octx.font = `300 ${size}px "Cormorant Garamond", Georgia, serif`;
     octx.textAlign = 'center';
     octx.textBaseline = 'middle';
@@ -672,7 +674,7 @@ const nameSeq = {
       x += widths[i] + tracking;
     });
 
-    const step = isSmall() ? 7 : 8;
+    const step = isSmall() ? 3 : 8;   // finer grid on phones = denser, more legible letters
     const data = octx.getImageData(0, 0, off.width, off.height).data;
     const pts = [];
     for (let py = 0; py < off.height; py += step){
@@ -684,7 +686,7 @@ const nameSeq = {
       const j = (Math.random() * (i + 1)) | 0;
       [pts[i], pts[j]] = [pts[j], pts[i]];
     }
-    return pts.slice(0, isSmall() ? 130 : 240);
+    return pts.slice(0, isSmall() ? 220 : 240);
   },
 
   start(){
